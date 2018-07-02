@@ -1,0 +1,31 @@
+1.使用@RequestBody 接受参数的时候，前台必须传json格式的数据，请求头的contentType必须要是application/json;
+2.mybatis 的mapper和xml 在xml里面 namespace的时候，mapper路径有空格导致找不到mapper 
+  statement binding错误org.apache.ibatis.binding.BindingException
+3.content-type错误的设置会导致media type错误以及jacksonpaser错误，导致jacksonpaser也可能是因为没有加入jackson  jar包
+4.No fallback instance of type class com.feign.sericefeign.SchedualServiceHiHystric found 
+在springboot使用feign 中配置断路器的时候，因为feign 是基于接口的注解，
+所以在@FeignClient(value = "service-hi",fallback =SchedualServiceHiHystric.class)的时候
+必须要在该接口的实现处添加@Component注解到IOC容器中
+5.mybatis返回自增主键的时候，必须要设置返回类型，resultType,并且返回类型要和实体的类型一致；
+6.使用jpush的时候：遇到问题，在springBoot项目中直接通过${}无法注入静态变量
+  可以使用set方法注入静态变量：
+    public static   String appKey;
+
+    public static   String secret;
+   @Value("${jpush.app.key}")
+    public void setAppKey(String jpushAppKey) {
+        appKey = jpushAppKey;
+    }
+
+    @Value("${jpush.master.secret}")
+    public void setSecret(String jpushSecret) {
+        secret = jpushSecret;
+    }
+7.
+tail -2000f  purchase-info.log|grep -20n '20180612151223797fmPmvfGsxo7xB'
+
+8.使用极光推送的时候，由于极光服务器推送超时，导致任务一直阻塞没有返回给前端结果，引出了很多问题
+解决方式：使用Springboot的异步任务@EnableAsync和@Async两个注解
+	  注意点：使用异步任务的时候，如果@Async该方法所在的类添加了 @Transactional注解时，spring扫描时具有@Transactional注解方法的类时，是生成一个代理类，由代理类去开启关闭事务，而在同一个类中，方法调用是在类体内执行的，spring无法截获这个方法调用。所以要把@Async提出到一个单独的类中调用
+9.使用springboot@Asyc异步调用的任务，在异步的类里面无法获取到主线程里面存储的变量，
+	解决办法：在主线程里面获取然后以参数的形式传进去

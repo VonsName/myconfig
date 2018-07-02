@@ -1,0 +1,42 @@
+    #!/bin/bash  
+    #zk服务器问题修复脚本  
+    #zkServer服务所在路径  
+    zkDir="/usr/local/zookeeper/bin/"  
+    zkLog='zookeeper.out'  
+    #进入zkServer.sh所在的目录  
+    cd $zkDir  
+    flag=1  
+    #当$flag=0时才停止循环设置无线循环  
+    until [ $flag -eq 0 ]  
+    do  
+        #查看zookeeper.out日志是否有错误信息  
+        while tail -f $zkLog | grep "ERROR"  
+        do  
+           #查看QuorumPeerMain服务是否启动  
+           for pid in `jps | grep "QuorumPeerMain"`  
+           do    
+               #如果启动pid不为空且pid不为零  
+               if [ -n "$pid" ] && [ "$pid" != "QuorumPeerMain" ]  
+               then  
+                     #关闭该进程  
+                     kill -9 $pid  
+                     #记录重启时间  
+                     date >>$zkDir/reStartDate.txt  
+                      #关闭zkServer  
+                     ./zkServer.sh stop  
+                     #运行zkServer.sh命令启动zk服务  
+                    if ./zkServer.sh start | grep "STARTED"  
+                    then  
+                        #查看服务状态  
+                        if ./zkServer.sh status | grep "Mode"  
+                        then   
+                            if jps | grep "QuorumPeerMain"  
+                            then  
+                              echo "restart Succeed！" >>$zkDir/reStartDate.txt  
+                            fi  
+                        fi  
+                    fi  
+                fi                                                                 
+           done  
+        done  
+    done  

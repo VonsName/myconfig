@@ -1,0 +1,17 @@
+1. bin/solr start -e cloud -h ip -p port  在SolrCloud模式下启动Solr
+2.curl 操作：http://localhost:8983/solr/techproducts/select?indent=on&q=*:*  查询
+	   ：http://localhost:8983/solr/techproducts/select?q=age:23&fl=id  条件查询  fl:标示只显示id字段
+3.在前面加上a +; 相反，为了不允许出现一个词或短语，用一个前缀-  +age-sex ：标示包含age但是不包括sex
+http://localhost:8983/solr/techproducts/select?q=%2Belectronics+-music 电子设备”但不包含“音乐
+4.bin/solr delete -c collection 删除集合
+5.bin/solr create -c <yourCollection> -s 2 -rf 2  -force 创建新的集合
+6.bin/solr stop -all 停止节点
+
+7.-X POST -H 'Content-type:application/json' --data-binary '
+{add-field: {name:"username", type:"text_general", multiValued:false, stored:true}}'
+ http://192.168.186:8983/solr/films/schema  添加字段到schmea中
+8.curl -X POST -H 'Content-type:application/json' --data-binary '
+{"add-copy-field" : {"source":"*","dest":"_text_"}}'
+ http://localhost:8983/solr/films/schema   添加复制字段到schmea中
+
+8.bin/post -c films example/films/films.json  导入films.json文件中的数据到films 集合中
